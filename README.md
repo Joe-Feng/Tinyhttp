@@ -1,6 +1,3 @@
-A mirror for tinyhttpd(Tinyhttpd非官方镜像,Fork自[sourceForge](https://sourceforge.net/projects/tiny-httpd/),仅供学习)
-
-测试CGI时需要本机安装PERL，同时安装perl-cgi
 
 ### Prepare 
 Compile for Linux
@@ -40,62 +37,8 @@ Compile for Linux
 <p>&nbsp; &nbsp; （6）读取整个 HTTP 请求并丢弃，如果是 POST 则找出 Content-Length. 把 HTTP 200 &nbsp;状态码写到套接字。</p>
 <p>&nbsp; &nbsp; （7） 建立两个管道，cgi_input 和 cgi_output, 并 fork 一个进程。</p>
 <p>&nbsp; &nbsp; （8） 在子进程中，把 STDOUT 重定向到 cgi_outputt 的写入端，把 STDIN 重定向到 cgi_input 的读取端，关闭 cgi_input 的写入端 和 cgi_output 的读取端，设置 request_method 的环境变量，GET 的话设置 query_string 的环境变量，POST 的话设置 content_length 的环境变量，这些环境变量都是为了给 cgi 脚本调用，接着用 execl 运行 cgi 程序。</p>
-<p>&nbsp; &nbsp; （9） 在父进程中，关闭 cgi_input 的读取端 和 cgi_output 的写入端，如果 POST 的话，把 POST 数据写入 cgi_input，已被重定向到 STDIN，读取 cgi_output 的管道输出到客户端，该管道输入是 STDOUT。接着关闭所有管道，等待子进程结束。这一部分比较乱，见下图说明：</p>
-<p><br>
-</p>
-<p><img src="http://img.blog.csdn.net/20141226173222750?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvamNqYzkxOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" width="484" height="222" alt=""><br>
-</p>
-<p>图 1 &nbsp; &nbsp;管道初始状态</p>
-<p><br>
-</p>
-<p><img src="http://img.blog.csdn.net/20141226161119981?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvamNqYzkxOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center" alt=""></p>
-<p> 图 2 &nbsp;管道最终状态&nbsp;</p>
-<p><br>
-</p>
-<p>&nbsp; &nbsp; （10） 关闭与浏览器的连接，完成了一次 HTTP 请求与回应，因为 HTTP 是无连接的。</p>
-<p><br>
-</p>
-
-以下内容来自源作者:
-
-  This software is copyright 1999 by J. David Blackstone.  Permission
-is granted to redistribute and modify this software under the terms of
-the GNU General Public License, available at http://www.gnu.org/ .
-
-  If you use this software or examine the code, I would appreciate
-knowing and would be overjoyed to hear about it at
-jdavidb@sourceforge.net .
-
-  This software is not production quality.  It comes with no warranty
-of any kind, not even an implied warranty of fitness for a particular
-purpose.  I am not responsible for the damage that will likely result
-if you use this software on your computer system.
-
-  I wrote this webserver for an assignment in my networking class in
-1999.  We were told that at a bare minimum the server had to serve
-pages, and told that we would get extra credit for doing "extras."
-Perl had introduced me to a whole lot of UNIX functionality (I learned
-sockets and fork from Perl!), and O'Reilly's lion book on UNIX system
-calls plus O'Reilly's books on CGI and writing web clients in Perl got
-me thinking and I realized I could make my webserver support CGI with
-little trouble.
-
-  Now, if you're a member of the Apache core group, you might not be
-impressed.  But my professor was blown over.  Try the color.cgi sample
-script and type in "chartreuse."  Made me seem smarter than I am, at
-any rate. :)
-
-  Apache it's not.  But I do hope that this program is a good
-educational tool for those interested in http/socket programming, as
-well as UNIX system calls.  (There's some textbook uses of pipes,
-environment variables, forks, and so on.)
-
-  One last thing: if you look at my webserver or (are you out of
-mind?!?) use it, I would just be overjoyed to hear about it.  Please
-email me.  I probably won't really be releasing major updates, but if
-I help you learn something, I'd love to know!
-
-  Happy hacking!
-
-                                   J. David Blackstone
-
+<p>&nbsp; &nbsp; （9） 在父进程中，关闭 cgi_input 的读取端 和 cgi_output 的写入端，如果 POST 的话，把 POST 数据写入 cgi_input，已被重定向到 STDIN，读取 cgi_output 的管道输出到客户端，该管道输入是 STDOUT。接着关闭所有管道，等待子进程结束。
+ 
+ 
+ 
+ Tinyhttp程序的逻辑为：一个无线循环，一个请求，创建一个线程，之后线程函数处理每个请求，然后解析HTTP请求，做一些判断，之后判断文件是否可执行，不可执行，打开文件，输出给客户端（浏览器），可执行就创建管道，父子进程进行通信。
